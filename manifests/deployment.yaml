@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-api
+  namespace: minio-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio-api
+  template:
+    metadata:
+      labels:
+        app: minio-api
+    spec:
+      containers:
+      - name: minio-api
+        image: localhost:32000/minio-api:1766350539
+        ports:
+        - containerPort: 8000
+        env:
+        - name: MINIO_ENDPOINT
+          value: "minio.minio-operator.svc.cluster.local:80"
+        - name: APP_USER
+          value: "python"
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-creds
+              key: access-key
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-creds
+              key: secret-key
