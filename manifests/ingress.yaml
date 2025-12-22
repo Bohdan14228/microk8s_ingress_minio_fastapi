@@ -10,10 +10,10 @@ spec:
   ingressClassName: public
   tls:
   - hosts:
-    - <your_domain>
+    - hydranoid.site
     secretName: minio-api-tls-secret # Здесь cert-manager сохранит сертификат
   rules:
-  - host: <your_domain>
+  - host: hydranoid.site
     http:
       paths:
       - path: /

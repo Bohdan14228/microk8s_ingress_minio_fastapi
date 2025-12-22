@@ -58,7 +58,8 @@ def get_bucket_info(uuid: str):
         return {
             "bucket": bucket_name,
             "object_count": count,
-            "total_size_mb": f"{total_size_mb} Mb"
+            "total_size_mb": f"{total_size_mb} Mb",
+            "add": "health"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

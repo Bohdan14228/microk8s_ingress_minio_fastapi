@@ -5,6 +5,12 @@ metadata:
   namespace: minio-operator
 spec:
   replicas: 1
+  # Стратегия обновления: плавная замена старых подов на новые
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
   selector:
     matchLabels:
       app: minio-api
@@ -13,11 +19,42 @@ spec:
       labels:
         app: minio-api
     spec:
+      # Запуск от не-root пользователя (безопасность)
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999 
       containers:
       - name: minio-api
-        image: localhost:32000/minio-api:1766422177
+        image: localhost:32000/minio-api:1766430357
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000
+        
+        # 1. Ресурсы: гарантируем минимум и ограничиваем максимум
+        resources:
+          requests:
+            cpu: "100m"      # 0.1 ядра
+            memory: "128Mi"
+          limits:
+            cpu: "500m"      # 0.5 ядра (чтобы один под не съел весь процессор)
+            memory: "256Mi"  # Если Python превысит это — K8s его перезапустит (OOMKill)
+
+        # 2. Liveness Probe: проверяет, не "зависло" ли приложение
+        livenessProbe:
+          httpGet:
+            path: /health    # Нужно добавить такой эндпоинт в FastAPI
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 20
+
+        # 3. Readiness Probe: проверяет, готово ли приложение принимать трафик
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
         env:
         - name: MINIO_ENDPOINT
           value: "minio.minio-operator.svc.cluster.local:80"
