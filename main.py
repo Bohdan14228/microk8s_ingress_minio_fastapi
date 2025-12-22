@@ -2,8 +2,21 @@ from fastapi import FastAPI, HTTPException
 from minio import Minio
 from minio.deleteobjects import DeleteObject
 import os
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-app = FastAPI()
+app = FastAPI(
+    title="MinIO API",
+    servers=[{"url": "https://hydranoid.site", "description": "Production server"}]
+)
+
+# Если планируете обращаться к API из браузера (Frontend)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 USERNAME = "python-"
 
@@ -72,3 +85,7 @@ def delete_bucket(uuid: str):
     except Exception as e:
         print(f"Delete failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}

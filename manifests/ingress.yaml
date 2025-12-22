@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-api-ingress
+  namespace: minio-operator
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod" # Ссылка на наш Issuer
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+spec:
+  ingressClassName: public
+  tls:
+  - hosts:
+    - <your_domain>
+    secretName: minio-api-tls-secret # Здесь cert-manager сохранит сертификат
+  rules:
+  - host: <your_domain>
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: minio-api # Имя твоего сервиса в K8s
+            port:
+              number: 8000

@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: minio-api-service
+  name: minio-api  # Это имя должно совпадать с 'backend.service.name' в Ingress
   namespace: minio-operator
 spec:
-  type: NodePort
+  type: ClusterIP  # Теперь нам не нужен NodePort, Ingress сам найдет сервис
   selector:
     app: minio-api
   ports:
-    - port: 80
-      targetPort: 8000
-      nodePort: 30088
+    - protocol: TCP
+      port: 8000       # Порт, который слушает Ingress
+      targetPort: 8000 # Порт внутри твоего контейнера (Uvicorn)
