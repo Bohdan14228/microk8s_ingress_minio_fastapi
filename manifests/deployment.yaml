@@ -25,7 +25,7 @@ spec:
         runAsUser: 999 
       containers:
       - name: minio-api
-        image: localhost:32000/minio-api:1766430357
+        image: localhost:32000/minio-api:1766605532
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8000

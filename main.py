@@ -4,6 +4,7 @@ from minio.deleteobjects import DeleteObject
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI(
     title="MinIO API",
@@ -90,3 +91,5 @@ def delete_bucket(uuid: str):
 @app.get("/health")
 def health_check():
     return {"status": "ok"}
+
+Instrumentator().instrument(app).expose(app)

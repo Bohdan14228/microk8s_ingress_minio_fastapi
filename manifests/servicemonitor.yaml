@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: minio-api-monitor
+  namespace: monitoring # Важно: оператор обычно ищет тут
+  labels:
+    release: monitoring # Этот лейбл должен совпадать с именем helm-релиза
+spec:
+  selector:
+    matchLabels:
+      app: minio-api # Лейбл твоего Service из прошлого урока
+  endpoints:
+  - port: http # Имя порта в твоем Service
+    path: /metrics
+    interval: 15s

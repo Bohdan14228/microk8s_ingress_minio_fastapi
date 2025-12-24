@@ -1,0 +1,14 @@
+alertmanager:
+  config:
+    route:
+      receiver: 'telegram-notifications' # Основной приемник по умолчанию
+      group_by: ['job']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+    receivers:
+    - name: 'telegram-notifications'
+      telegram_configs:
+      - bot_token: '8416071524:Ej8KGM0IZ23U_Ql9OuxR0xNgE'
+        chat_id: 49259
+        send_resolved: true

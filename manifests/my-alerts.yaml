@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  labels:
+    app: kube-prometheus-stack
+    release: monitoring # Это должно совпадать с именем твоего helm-релиза
+  name: extra-alerts
+  namespace: monitoring
+spec:
+  groups:
+  - name: custom.rules
+    rules:
+    - alert: PodFrequentlyRestarting
+      # ИСПРАВЛЕНО: increase вместо increases
+      expr: increase(kube_pod_container_status_restarts_total[15m]) > 3
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Под {{ $labels.pod }} часто перезагружается"
+        description: "Под {{ $labels.pod }} в namespace {{ $labels.namespace }} перезагрузился более 3 раз за последние 15 минут."
